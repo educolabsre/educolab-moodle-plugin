@@ -1,0 +1,65 @@
+.page {
+  display: none;
+}
+
+[id^="instance-"][id$="-header"] {
+  display: none !important; /* Hides the block title */
+}
+
+.page.active {
+  display: block;
+}
+
+.plugin-navbar {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.arrow {
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.toast {
+  background-color: #f9f9f9 !important;
+  color: #333 !important;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.toast-success {
+  border-left: 5px solid #4caf50;  
+}
+
+div.toast.toast-success .toast-body:before {
+  content: none;
+}
+
+.toast-error {
+  border-left: 5px solid #ff6767;  
+}
+
+.toast-header {
+  background-color: #f9f9f9 !important;
+  border-bottom: none;
+}
+
+.toast-header-success {
+  color: #4caf50 !important; 
+}
+
+.toast-header-error {
+  color: #ff6767 !important; 
+}
+
+.toast-body {
+  color: #333 !important;
+}
+
+.close {
+  color: #999 !important;
+}
+
+.close:hover {
+  color: #333 !important;
+}

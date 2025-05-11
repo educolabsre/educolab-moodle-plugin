@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/educolab/db" VERSION="20250114" COMMENT="XMLDB file for Moodle blocks/educolab"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_educolab" COMMENT="Default comment for block_educolab, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="start_date" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Starting timestamp for forum monitoring"/>
+        <FIELD NAME="end_date" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Ending timestamp for forum monitoring"/>
+        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the monitored forum"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id, forumid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_educolab_schedule" COMMENT="Stores forum schedule configurations">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the associated forum"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the associated course"/>
+        <FIELD NAME="recurrence" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Recurrence pattern for the schedule"/>
+        <FIELD NAME="nextrun" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Next run timestamp"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of the last modification"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id, forumid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_educolab_recommendations" COMMENT="Table for saving the recommendation texts">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="confirmation_text" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Text for the confirmation recommendation"/>
+        <FIELD NAME="forumid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the forum"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id, forumid"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
