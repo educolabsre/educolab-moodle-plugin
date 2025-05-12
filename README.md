@@ -11,18 +11,26 @@ O **EduColab** é um plugin do tipo bloco para o Moodle que integra um Sistema d
 - Definição do período de monitoramento.
 - Solicitação automática de consentimento dos alunos por e-mail.
 
+![Tela de cadastro do fórum](./assets/images/plugin_3.png)
+
 ### 📊 Análise de Fóruns
 - Execução manual ou automática de análises das mensagens postadas.
 - Geração de índices de colaboração com base em técnicas de análise conversacional.
 - Envio automático de recomendações por e-mail a alunos e professores.
 
+![Tela de análise do fórum](./assets/images/plugin_4.png)
+
 ### 🔁 Agendamento de Análises Automáticas
 - Permite definir a frequência das análises (diária, semanal, quinzenal, etc.).
 - Utiliza tarefas programadas no Moodle para executar as análises nas datas agendadas.
 
+![Tela de agendamento de análises](./assets/images/plugin_5.png)
+
 ### ✏️ Personalização de Recomendações
 - Edição do conteúdo dos e-mails de confirmação enviados aos estudantes.
 - Uso de variáveis dinâmicas no corpo do e-mail para personalização das mensagens.
+
+![Tela de personalização de recomendações](./assets/images/plugin_6.png)
 
 ### 🔧 Integração Técnica
 - Desenvolvido em **PHP** como bloco do Moodle.
