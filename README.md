@@ -1,31 +1,54 @@
-# EduColab #
+# Plugin EduColab para o Moodle #
 
-TODO Describe the plugin shortly here.
+O **EduColab** é um plugin do tipo bloco para o Moodle que integra um Sistema de Recomendação Educacional (SRE), automatizando a análise de fóruns de discussão e promovendo a aprendizagem colaborativa. Com ele, professores podem monitorar a participação dos alunos e receber recomendações personalizadas que ajudam a estimular o engajamento nas discussões.
 
-TODO Provide more detailed description here.
+---
 
-## Installing via uploaded ZIP file ##
+## Funcionalidades
 
-1. Log in to your Moodle site as an admin and go to _Site administration >
-   Plugins > Install plugins_.
-2. Upload the ZIP file with the plugin code. You should only be prompted to add
-   extra details if your plugin type is not automatically detected.
-3. Check the plugin validation report and finish the installation.
+### 📥 Cadastro de Fóruns
+- Seleção de fóruns existentes no curso.
+- Definição do período de monitoramento.
+- Solicitação automática de consentimento dos alunos por e-mail.
 
-## Installing manually ##
+### 📊 Análise de Fóruns
+- Execução manual ou automática de análises das mensagens postadas.
+- Geração de índices de colaboração com base em técnicas de análise conversacional.
+- Envio automático de recomendações por e-mail a alunos e professores.
 
-The plugin can be also installed by putting the contents of this directory to
+### 🔁 Agendamento de Análises Automáticas
+- Permite definir a frequência das análises (diária, semanal, quinzenal, etc.).
+- Utiliza tarefas programadas no Moodle para executar as análises nas datas agendadas.
 
-    {your/moodle/dirroot}/blocks/educolab
+### ✏️ Personalização de Recomendações
+- Edição do conteúdo dos e-mails de confirmação enviados aos estudantes.
+- Uso de variáveis dinâmicas no corpo do e-mail para personalização das mensagens.
 
-Afterwards, log in to your Moodle site as an admin and go to _Site administration >
-Notifications_ to complete the installation.
+### 🔧 Integração Técnica
+- Desenvolvido em **PHP** como bloco do Moodle.
+- Comunicação com o SRE (implementado em **Python**) por meio de uma **API REST** escrita em **Node.js + Express**.
 
-Alternatively, you can run
+---
+
+## 📦 Instalação via arquivo ZIP (upload manual)
+
+1. Acesse sua instalação do Moodle como administrador e vá até _Administração do site > Plugins > Instalar plugins_.
+2. Envie o arquivo ZIP com o código do plugin. Você só será solicitado a preencher informações adicionais se o tipo de plugin não for detectado automaticamente.
+3. Verifique o relatório de validação do plugin e finalize a instalação.
+
+## 🛠️ Instalação manual (diretório do servidor)
+
+O plugin também pode ser instalado manualmente copiando o conteúdo deste diretório para:
+
+    {seu/moodle/dirroot}/blocks/educolab
+
+Depois disso, acesse o Moodle como administrador e vá até _Administração do site > Notificações_ para concluir a instalação.
+
+Alternativamente, você pode executar o seguinte comando no terminal:
 
     $ php admin/cli/upgrade.php
 
-to complete the installation from the command line.
+para concluir a instalação via linha de comando.
 
 ## License ##
 
