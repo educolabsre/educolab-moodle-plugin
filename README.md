@@ -14,7 +14,7 @@ O **EduColab** é um plugin do tipo bloco para o Moodle que integra um Sistema d
   - [🔧 Integração Técnica](#-integração-técnica)
 - [📦 Instalação via arquivo ZIP (upload manual)](#-instalação-via-arquivo-zip-upload-manual)
 - [🛠️ Instalação manual (diretório do servidor)](#️-instalação-manual-diretório-do-servidor)
-- [📚 Produções Relacionadas](#️-produções-relacionadas)
+- [📚 Produções Relacionadas](#-produções-relacionadas)
 - [📄 Licença](#-licença)
 
 ---
