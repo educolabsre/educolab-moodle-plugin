@@ -14,6 +14,7 @@ O **EduColab** é um plugin do tipo bloco para o Moodle que integra um Sistema d
   - [🔧 Integração Técnica](#-integração-técnica)
 - [📦 Instalação via arquivo ZIP (upload manual)](#-instalação-via-arquivo-zip-upload-manual)
 - [🛠️ Instalação manual (diretório do servidor)](#️-instalação-manual-diretório-do-servidor)
+- [📚 Produções Relacionadas](#️-produções-relacionadas)
 - [📄 Licença](#-licença)
 
 ---
@@ -71,6 +72,24 @@ Alternativamente, você pode executar o seguinte comando no terminal:
     $ php admin/cli/upgrade.php
 
 para concluir a instalação via linha de comando.
+
+---
+
+## 📚 Produções Relacionadas
+
+### 📄 Artigos e Trabalhos Acadêmicos
+
+- **[Aprendizado de Máquina em Análise Conversacional para Recomendar a Colaboração em Fóruns de Discussão](https://sol.sbc.org.br/index.php/sbie/article/view/31366)**  
+  *Publicado nos Anais do Simpósio Brasileiro de Informática na Educação (SBIE 2024)*  
+  Autores: Gabriel J. C. Lima, Antônio J. Moraes Neto, Raimundo C. S. Vasconcelos, Márcia A. Fernandes e Tel Amiel
+  
+  [🔗 Acesso direto ao artigo (PDF)](https://sol.sbc.org.br/index.php/sbie/article/view/31366/31169)
+
+- **[EduColab: Sistema de recomendação educacional para promover a colaboração em fóruns de discussão](https://repositorio.ufu.br/handle/123456789/43669)**<br>
+  *Tese de Doutorado – Universidade Federal de Uberlândia (UFU), 2024*  
+  Autor: Antônio Justiniano de Moraes Neto
+
+  [🔗 Acesso direto à tese (PDF)](https://repositorio.ufu.br/bitstream/123456789/43669/3/EduColabSistema.pdf)
 
 ## 📄 Licença
 
