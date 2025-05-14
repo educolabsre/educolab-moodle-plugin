@@ -10,7 +10,7 @@ O **EduColab** é um plugin do tipo bloco para o Moodle que integra um Sistema d
   - [📥 Cadastro de Fóruns](#-cadastro-de-fóruns)
   - [📊 Análise de Fóruns](#-análise-de-fóruns)
   - [🔁 Agendamento de Análises Automáticas](#-agendamento-de-análises-automáticas)
-  - [✏️ Personalização de Recomendações](#-personalização-de-recomendações)
+  - [✏️ Personalização de Recomendações](#%EF%B8%8F-personalização-de-recomendações)
   - [🔧 Integração Técnica](#-integração-técnica)
 - [📦 Instalação via arquivo ZIP (upload manual)](#-instalação-via-arquivo-zip-upload-manual)
 - [🛠️ Instalação manual (diretório do servidor)](#️-instalação-manual-diretório-do-servidor)
