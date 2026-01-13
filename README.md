@@ -93,7 +93,7 @@ para concluir a instalação via linha de comando.
 
 ## 📄 Licença
 
-© 2025 Antônio Justiniano de Moraes Neto <antonio.neto@ifb.edu.br>; Gabriel Lima <gabriel.lima6@estudante.ifb.edu.br>.
+© 2025 Antônio Justiniano de Moraes Neto, <antonio.neto@ifb.edu.br>; Gabriel Lima, <gabriel.lima6@estudante.ifb.edu.br>.
 
 Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo sob os termos da Licença Pública Geral GNU, conforme publicada pela Free Software Foundation, na versão 3 da Licença ou (a seu critério) qualquer versão posterior.
 
