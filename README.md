@@ -81,19 +81,19 @@ para concluir a instalação via linha de comando.
 
 - **[Aprendizado de Máquina em Análise Conversacional para Recomendar a Colaboração em Fóruns de Discussão](https://sol.sbc.org.br/index.php/sbie/article/view/31366)**  
   *Publicado nos Anais do Simpósio Brasileiro de Informática na Educação (SBIE 2024)*  
-  Autores: Gabriel J. C. Lima, Antônio J. Moraes Neto, Raimundo C. S. Vasconcelos, Márcia A. Fernandes e Tel Amiel
+  Autores: MORAES NETO, Antônio J.; VASCONCELOS, Raimundo C. S.; LIMA, Gabriel J. C.; FERNANDES, Márcia A.; AMIEL, Tel.
   
   [🔗 Acesso direto ao artigo (PDF)](https://sol.sbc.org.br/index.php/sbie/article/view/31366/31169)
 
 - **[EduColab: Sistema de recomendação educacional para promover a colaboração em fóruns de discussão](https://repositorio.ufu.br/handle/123456789/43669)**<br>
-  *Tese de Doutorado – Universidade Federal de Uberlândia (UFU), 2024*  
-  Autor: Antônio Justiniano de Moraes Neto
+  *Tese (Doutorado em Ciência da Computação​) - Universidade Federal de Uberlândia, Uberlândia, 2024.*  
+  Autor: MORAES NETO, Antônio Justiniano de.
 
   [🔗 Acesso direto à tese (PDF)](https://repositorio.ufu.br/bitstream/123456789/43669/3/EduColabSistema.pdf)
 
 ## 📄 Licença
 
-© 2025 Gabriel Lima <gabriel.lima6@estudante.ifb.edu.br>
+© 2025 Antônio Justiniano de Moraes Neto <antonio.neto@ifb.edu.br>; Gabriel Lima <gabriel.lima6@estudante.ifb.edu.br>.
 
 Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo sob os termos da Licença Pública Geral GNU, conforme publicada pela Free Software Foundation, na versão 3 da Licença ou (a seu critério) qualquer versão posterior.
 
