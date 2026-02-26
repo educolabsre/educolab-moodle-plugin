@@ -1,6 +1,12 @@
 define(['jquery', 'core/ajax'], function($, Ajax) {
+    let initialized = false;
     return {
         init: function() {
+            if (initialized) {
+                return;
+            }
+            initialized = true;
+
             const pages = {
                 initialState: document.getElementById('page-initialState'),
                 cadastro: document.getElementById('page-cadastro'),
@@ -16,15 +22,15 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 pages[pageKey].classList.add('active');
             }
 
-            const toastEl = document.getElementById("successToast");
-
-            const toast = new bootstrap.Toast(toastEl, { autohide: false });
-
             function showToast(message, status) {
                 const toastEl = document.getElementById("successToast");
+                if (!toastEl) return; // Guard against missing element
+                
                 const toastHeader = document.querySelector(".toast-header");
                 const toastHeaderTitle = document.getElementById("toast-header-title");
                 const toastBody = document.querySelector(".toast-body");
+
+                if (!toastHeader || !toastHeaderTitle || !toastBody) return; // Guard against missing elements
 
                 const statusClasses = {
                     success: {
@@ -46,7 +52,15 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 toastBody.innerHTML = message;
                 toastHeaderTitle.innerHTML = status == "success" ? "Sucesso" : "Erro";
 
-                toast.show();
+                // Show the toast
+                toastEl.classList.add('show');
+                toastEl.style.display = 'block';
+
+                // Hide after 5 seconds
+                setTimeout(() => {
+                    toastEl.classList.remove('show');
+                    toastEl.style.display = 'none';
+                }, 5000);
             }
 
             $(document).ready(function () {
@@ -94,209 +108,197 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 });
 
                 $('.close').on('click', function() {
-                    toast.hide();
+                    const toastEl = document.getElementById("successToast");
+                    toastEl.classList.remove('show');
+                    toastEl.style.display = 'none';
                 });
 
                 $('#cadastro').on('click', function() {
                     switchPage('cadastro');
-
                     document.getElementById('back-arrow').classList.add('active');
+                });
 
-                    $('#back-arrow').on('click', function() {
-                        switchPage('initialState');
-                        document.getElementById('back-arrow').classList.remove('active');
+                $('#btn-cadastro').on('click', function() {
+                    const button = document.getElementById("btn-cadastro");
+
+                    button.setAttribute('disabled', 'true');
+                    button.querySelector('.spinner-border').classList.remove('d-none');
+
+                    const forumInfoElement = document.getElementById('forum-info');
+
+                    const forumId = forumInfoElement.dataset.forumid;
+
+                    const startDate = document.getElementById("start-date").value;
+                    const endDate = document.getElementById("end-date").value;
+
+                    const url = forumCadastrado ? 'http://localhost:3000/atualizar-cadastro' : 'http://localhost:3000/cadastro';
+
+                    const students = window.educolab.students;
+
+                    const csv_header = ["Nome", "Sobrenome", "Email"];
+                    const csv_rows = students.map(student => [student.id, student.firstname, student.lastname, student.email]);
+
+                    const csv_students = [
+                        csv_header.join(','),
+                        ...csv_rows.map(row => row.join(','))
+                    ].join('\n');
+
+                    const reqBody = forumCadastrado ? JSON.stringify({
+                        forumID: forumId,
+                        data_final: endDate
+
+                    }) : JSON.stringify({
+                        identifica_forum: forumInfoElement.dataset.identificaforum,
+                        nome_professor: forumInfoElement.dataset.nomeprofessor,
+                        email_professor: forumInfoElement.dataset.emailprofessor,
+                        link_forum: forumInfoElement.dataset.linkforum,
+                        data_inicio: startDate,
+                        data_final: endDate,
+                        estudantes: csv_students,
+                        confirmacao: forumInfoElement.dataset.confirmacao
                     });
 
-                    $('#btn-cadastro').on('click', function() {
-                        const button = document.getElementById("btn-cadastro");
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: reqBody
+                    })
+                    .then(response => {
+                        if(!response.ok) {
+                            throw new Error('Request error');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        button.querySelector('.spinner-border').classList.add('d-none');
+                        button.removeAttribute('disabled');
 
-                        button.setAttribute('disabled', 'true');
-                        button.querySelector('.spinner-border').classList.remove('d-none');
+                        if(data?.error) {
+                            showToast(data?.error, "error");
 
-                        const forumInfoElement = document.getElementById('forum-info');
+                        } else if(data?.success) {
+                            showToast(data?.success, "success");
 
-                        const forumId = forumInfoElement.dataset.forumid;
+                            document.querySelectorAll('.list-group-item').forEach((item) => item.classList.remove('disabled'));
+                            document.getElementById('back-arrow').classList.remove('active');
 
-                        const startDate = document.getElementById("start-date").value;
-                        const endDate = document.getElementById("end-date").value;
+                            const firstOption = document.getElementById('monitoramento');
+                            firstOption.innerHTML = "Editar monitoramento";
 
-                        Ajax.call([{
-                            methodname: 'block_educolab_save_monitoring_dates',
-                            args: {
-                                forumid: forumId,
-                                start_date: startDate,
-                                end_date: endDate
-                            },
-                            done: function() {
-
-                            },
-                            fail: function(error) {
-                                
-                            }
-                        }]);
-
-                        const url = forumCadastrado ? 'http://localhost:3000/atualizar-cadastro' : 'http://localhost:3000/cadastro';
-
-                        const students = window.educolab.students;
-
-                        const csv_header = ["Nome", "Sobrenome", "Email"];
-                        const csv_rows = students.map(student => [student.id, student.firstname, student.lastname, student.email]);
-
-                        const csv_students = [
-                            csv_header.join(','),
-                            ...csv_rows.map(row => row.join(','))
-                        ].join('\n');
-
-                        const reqBody = forumCadastrado ? JSON.stringify({
-                            forumID: forumId,
-                            data_final: endDate
-
-                        }) : JSON.stringify({
-                            identifica_forum: forumInfoElement.dataset.identificaforum,
-                            nome_professor: forumInfoElement.dataset.nomeprofessor,
-                            email_professor: forumInfoElement.dataset.emailprofessor,
-                            link_forum: forumInfoElement.dataset.linkforum,
-                            data_inicio: startDate,
-                            data_final: endDate,
-                            estudantes: csv_students,
-                            confirmacao: forumInfoElement.dataset.confirmacao
-                        });
-
-                        fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: reqBody
-                        })
-                        .then(response => {
-                            if(!response.ok) {
-                                throw new Error('Request error');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            button.querySelector('.spinner-border').classList.add('d-none');
-                            button.removeAttribute('disabled');
-
-                            if(data?.error) {
-                                showToast(data?.error, "error");
-
-                            } else if(data?.success) {
-                                showToast(data?.success, "success");
-
-                                document.querySelectorAll('.list-group-item').forEach((item) => item.classList.remove('disabled'));
-                                document.getElementById('back-arrow').classList.remove('active');
-
-                                const firstOption = document.getElementById('monitoramento');
-                                firstOption.innerHTML = "Editar monitoramento";
-
-                                switchPage('initialState');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error', error);
-                        })
-                        .finally(() => {
-                            button.querySelector('.spinner-border').classList.add('d-none');
-                            button.removeAttribute('disabled');
-                        });
+                            switchPage('initialState');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error', error);
+                    })
+                    .finally(() => {
+                        button.querySelector('.spinner-border').classList.add('d-none');
+                        button.removeAttribute('disabled');
                     });
                 });
 
                 $('#analise').on('click', function() {
                     switchPage('analise');
-
                     document.getElementById('back-arrow').classList.add('active');
+                });
 
-                    $('#back-arrow').on('click', function() {
-                        switchPage('initialState');
-                        document.getElementById('back-arrow').classList.remove('active');
-                    });
+                $('#btn-analise').on('click', function() {
+                    const button = document.getElementById("btn-analise");
 
-                    $('#btn-analise').on('click', function() {
-                        const button = document.getElementById("btn-analise");
+                    button.setAttribute('disabled', 'true');
+                    button.querySelector('.spinner-border').classList.remove('d-none');
+                    
+                    const forumInfoElement = document.getElementById('forum-info');
 
-                        button.setAttribute('disabled', 'true');
-                        button.querySelector('.spinner-border').classList.remove('d-none');
+                    const url = 'http://localhost:3000/analise';
+
+                    const messages = window.educolab.messages;
+
+                    const csv_header = ["id","discussion","parent","userid","userfullname","created","modified","mailed","subject","message","wordcount"];
+                    const csv_rows = messages.map(message => [message.id, message.discussion, message.parent, message.userid, message.userfullname, message.created, message.modified, message.mailed, message.subject, message.message, message.wordcount]);
+
+                    const csv_messages = [
+                        csv_header.join(','),
+                        ...csv_rows.map(row => row.join(','))
+                    ].join('\n');
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            forumID: forumInfoElement.dataset.forumid,
+                            messages: csv_messages
+                        })
+                    })
+                    .then(response => {
+                        if(!response.ok) {
+                            throw new Error('Request error');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
                         
-                        const forumInfoElement = document.getElementById('forum-info');
-    
-                        const url = 'http://localhost:3000/analise';
-    
-                        const messages = window.educolab.messages;
-    
-                        const csv_header = ["id","discussion","parent","userid","userfullname","created","modified","mailed","subject","message","wordcount"];
-                        const csv_rows = messages.map(message => [message.id, message.discussion, message.parent, message.userid, message.userfullname, message.created, message.modified, message.mailed, message.subject, message.message, message.wordcount]);
-    
-                        const csv_messages = [
-                            csv_header.join(','),
-                            ...csv_rows.map(row => row.join(','))
-                        ].join('\n');
-    
-                        fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                forumID: forumInfoElement.dataset.forumid,
-                                messages: csv_messages
-                            })
-                        })
-                        .then(response => {
-                            if(!response.ok) {
-                                throw new Error('Request error');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log(data);
-                            
-                            button.querySelector('.spinner-border').classList.add('d-none');
-                            button.removeAttribute('disabled');
-    
-                            if(data?.error) {
-                                showToast(data?.error, "error");
-    
-                            } else if(data?.success) {
-                                showToast(data?.success, "success");
-    
-                                document.getElementById('back-arrow').classList.remove('active');
-    
-                                switchPage('initialState');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error', error);
-                        })
-                        .finally(() => {
-                            button.querySelector('.spinner-border').classList.add('d-none');
-                            button.removeAttribute('disabled');
-                        });
+                        button.querySelector('.spinner-border').classList.add('d-none');
+                        button.removeAttribute('disabled');
+
+                        if(data?.error) {
+                            showToast(data?.error, "error");
+
+                        } else if(data?.success) {
+                            showToast(data?.success, "success");
+
+                            document.getElementById('back-arrow').classList.remove('active');
+
+                            switchPage('initialState');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error', error);
+                    })
+                    .finally(() => {
+                        button.querySelector('.spinner-border').classList.add('d-none');
+                        button.removeAttribute('disabled');
                     });
                 });
 
                 $('#recorrencia').on('click', function() {
                     switchPage('recorrencia');
-
                     document.getElementById('back-arrow').classList.add('active');
-
-                    $('#back-arrow').on('click', function() {
-                        switchPage('initialState');
-                        document.getElementById('back-arrow').classList.remove('active');
-                    });
                 });
 
                 $('#personalizar').on('click', function() {
                     switchPage('personalizar');
-
                     document.getElementById('back-arrow').classList.add('active');
+                });
 
-                    $('#back-arrow').on('click', function() {
-                        switchPage('initialState');
-                        document.getElementById('back-arrow').classList.remove('active');
-                    });
+                $('#ver-recomendacao').on('click', function() {
+                    Ajax.call([{
+                        methodname: 'block_educolab_generate_token',
+                        args: {},
+                        done: function(result) {
+                            if (result.status === 'success' && result.token) {
+                                var token = result.token;
+                                var url = 'http://localhost:8501/?token=' + encodeURIComponent(token);
+                                window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+                            } else {
+                                showToast('Erro ao gerar token de acesso.', 'error');
+                            }
+                        },
+                        fail: function(error) {
+                            showToast('Falha ao gerar token. Tente novamente mais tarde.', 'error');
+                            console.error('Token generation error:', error);
+                        }
+                    }]);
+                });
+
+                $('#back-arrow').on('click', function() {
+                    switchPage('initialState');
+                    document.getElementById('back-arrow').classList.remove('active');
                 });
 
                 $('#save-schedule-btn').on('click', function() {

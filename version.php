@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_educolab';
-$plugin->release = '0.1.0';
-$plugin->version = 2025010108;
+$plugin->release = '0.1.1';
+$plugin->version = 2025010109;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_STABLE;

@@ -34,7 +34,13 @@ class block_educolab extends block_base {
     }
 
     function get_content() {
-        global $DB, $COURSE, $OUTPUT, $CFG, $PAGE;
+        global $DB, $COURSE, $OUTPUT, $CFG, $PAGE, $USER;
+
+        // Load CSS for the block
+        $PAGE->requires->css(new moodle_url('/blocks/educolab/styles/styles.css'));
+        
+        // Load AMD module
+        $PAGE->requires->js_call_amd('block_educolab/script', 'init');
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -52,6 +58,9 @@ class block_educolab extends block_base {
         $forum_url = new moodle_url('mod/forum/view.php', ['id' => $course_module->id]);
         
         $context = context_course::instance($COURSE->id);
+        
+        // Check if the user is a teacher by checking if they have course editing capability
+        $is_teacher = has_capability('moodle/course:manageactivities', $context);
         
         $teacherRole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         $teachers = get_role_users($teacherRole->id, $context, false, 'u.id, u.firstname, u.lastname, u.email');
@@ -101,7 +110,7 @@ class block_educolab extends block_base {
             }
         }
 
-        $forum_dates = $DB->get_record('block_educolab', ['forumid' => $course_module->id]);
+        $forum_dates = \block_educolab\external_db::get_forum_dates($course_module->id);
         $forum_schedule = $DB->get_record('block_educolab_schedule', ['forumid' => $course_module->id]);
         $forum_recommendations = $DB->get_record('block_educolab_recommendations', ['forumid' => $course_module->id]);
 
@@ -121,7 +130,8 @@ class block_educolab extends block_base {
             'messages' => json_encode($messages),
             'forum_end_date' => $forum_dates ? date('Y-m-d', $forum_dates->end_date) : "",
             'scheduled_start_date' => $forum_schedule ? date('Y-m-d', $forum_schedule->end_date) : "",
-            'confirmation_text' => $rendered_text
+            'confirmation_text' => $rendered_text,
+            'is_teacher' => $is_teacher
         ];
         
         $this->content->text = $OUTPUT->render_from_template('block_educolab/index', $plugin_context);
