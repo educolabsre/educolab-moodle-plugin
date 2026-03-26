@@ -13,6 +13,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 analise: document.getElementById('page-analise'),
                 recorrencia: document.getElementById('page-recorrencia'),
                 personalizar: document.getElementById('page-personalizar'),
+                consentimento: document.getElementById('page-consentimento'),
             };
 
             let forumCadastrado = false;
@@ -283,7 +284,9 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                         done: function(result) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
-                                var url = 'http://localhost:8501/?token=' + encodeURIComponent(token);
+                                var username = result.username || '';
+                                var url = 'http://localhost:8501/?moodle_token=' + encodeURIComponent(token)
+                                    + '&username=' + encodeURIComponent(username);
                                 window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                             } else {
                                 showToast('Erro ao gerar token de acesso.', 'error');
@@ -295,6 +298,111 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                         }
                     }]);
                 });
+
+                // Student: View last recommendation (same behavior as teacher, with forumId)
+                $('#ver-recomendacao-aluno').on('click', function() {
+                    var forumInfoElement = document.getElementById('forum-info');
+                    var forumId = forumInfoElement.dataset.forumid;
+
+                    Ajax.call([{
+                        methodname: 'block_educolab_generate_token',
+                        args: {},
+                        done: function(result) {
+                            if (result.status === 'success' && result.token) {
+                                var token = result.token;
+                                var username = result.username || '';
+                                var url = 'http://localhost:8501/?moodle_token=' + encodeURIComponent(token)
+                                    + '&forum_id=' + encodeURIComponent(forumId)
+                                    + '&username=' + encodeURIComponent(username);
+                                window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+                            } else {
+                                showToast('Erro ao gerar token de acesso.', 'error');
+                            }
+                        },
+                        fail: function(error) {
+                            showToast('Falha ao gerar token. Tente novamente mais tarde.', 'error');
+                            console.error('Token generation error:', error);
+                        }
+                    }]);
+                });
+
+                // Student: Open consent page
+                $('#atualizar-consentimento').on('click', function() {
+                    switchPage('consentimento');
+                    document.getElementById('back-arrow').classList.add('active');
+                });
+
+                // Student: Consent button
+                $('#btn-consentir').on('click', function() {
+                    var button = document.getElementById('btn-consentir');
+                    button.setAttribute('disabled', 'true');
+                    button.querySelector('.spinner-border').classList.remove('d-none');
+
+                    var forumInfoElement = document.getElementById('forum-info');
+                    var forumId = forumInfoElement.dataset.forumid;
+
+                    Ajax.call([{
+                        methodname: 'block_educolab_update_consent',
+                        args: { forumId: forumId, consent: 1 },
+                        done: function(result) {
+                            button.querySelector('.spinner-border').classList.add('d-none');
+                            button.removeAttribute('disabled');
+
+                            if (result.status === 'success') {
+                                showToast(result.message, 'success');
+                                updateConsentBadge(true);
+                            } else {
+                                showToast(result.message, 'error');
+                            }
+                        },
+                        fail: function(error) {
+                            button.querySelector('.spinner-border').classList.add('d-none');
+                            button.removeAttribute('disabled');
+                            showToast('Erro ao atualizar consentimento. Tente novamente.', 'error');
+                            console.error('Consent update error:', error);
+                        }
+                    }]);
+                });
+
+                // Student: Withdraw consent button
+                $('#btn-nao-consentir').on('click', function() {
+                    var button = document.getElementById('btn-nao-consentir');
+                    button.setAttribute('disabled', 'true');
+                    button.querySelector('.spinner-border').classList.remove('d-none');
+
+                    var forumInfoElement = document.getElementById('forum-info');
+                    var forumId = forumInfoElement.dataset.forumid;
+
+                    Ajax.call([{
+                        methodname: 'block_educolab_update_consent',
+                        args: { forumId: forumId, consent: 0 },
+                        done: function(result) {
+                            button.querySelector('.spinner-border').classList.add('d-none');
+                            button.removeAttribute('disabled');
+
+                            if (result.status === 'success') {
+                                showToast(result.message, 'success');
+                                updateConsentBadge(false);
+                            } else {
+                                showToast(result.message, 'error');
+                            }
+                        },
+                        fail: function(error) {
+                            button.querySelector('.spinner-border').classList.add('d-none');
+                            button.removeAttribute('disabled');
+                            showToast('Erro ao atualizar consentimento. Tente novamente.', 'error');
+                            console.error('Consent update error:', error);
+                        }
+                    }]);
+                });
+
+                function updateConsentBadge(consented) {
+                    var badge = document.querySelector('#consent-status .badge');
+                    if (badge) {
+                        badge.className = 'badge ' + (consented ? 'badge-success' : 'badge-secondary');
+                        badge.textContent = 'Status atual: ' + (consented ? 'Consentido' : 'Não consentido');
+                    }
+                }
 
                 $('#back-arrow').on('click', function() {
                     switchPage('initialState');

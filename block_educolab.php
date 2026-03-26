@@ -119,6 +119,16 @@ class block_educolab extends block_base {
 
         $rendered_text = format_text($confirmation_text, $confirmation_text_format);
 
+        // Check student enrollment and consent from external DB (only for students)
+        $student_enrolled = false;
+        $student_consented = false;
+        if (!$is_teacher) {
+            $consent = \block_educolab\external_db::get_student_consent($USER->email, (string) $course_module->id);
+            // If consent is not null, student exists in foruns_estudantes for this forum
+            $student_enrolled = ($consent !== null);
+            $student_consented = ($consent === 1);
+        }
+
         $plugin_context = [
             'identifica_forum' => $forum->name,
             'nome_professor' => $firstTeacher->firstname . ' ' . $firstTeacher->lastname,
@@ -131,7 +141,9 @@ class block_educolab extends block_base {
             'forum_end_date' => $forum_dates ? date('Y-m-d', $forum_dates->end_date) : "",
             'scheduled_start_date' => $forum_schedule ? date('Y-m-d', $forum_schedule->end_date) : "",
             'confirmation_text' => $rendered_text,
-            'is_teacher' => $is_teacher
+            'is_teacher' => $is_teacher,
+            'student_enrolled' => $student_enrolled,
+            'student_consented' => $student_consented,
         ];
         
         $this->content->text = $OUTPUT->render_from_template('block_educolab/index', $plugin_context);

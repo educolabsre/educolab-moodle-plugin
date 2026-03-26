@@ -76,29 +76,37 @@ class external_db {
      * Generate and save a token for a user.
      * If a token already exists for this user, it will be replaced.
      *
-     * @param int $userid The Moodle user ID
+     * @param string $email The user email
+     * @param string $tipoUsuario The user type
      * @return string The generated token
      * @throws \PDOException
      */
-    public static function generate_user_token(int $userid): string {        
+    public static function generate_user_token(string $email, string $tipoUsuario = 'aluno'): string {        
         $pdo = self::get_connection();
         
         // Generate a unique token
         $token = bin2hex(random_bytes(32));
         
+        // Token creation and expiration times (24 hours from now)
+        $tokenCreated = time() * 1000; // milliseconds
+        $tokenExpires = ($tokenCreated + (24 * 60 * 60 * 1000)); // 24 hours in milliseconds
+        
         try {
             // Delete any existing tokens for this user first
-            $deleteStmt = $pdo->prepare('DELETE FROM tokens WHERE userid = :userid');
-            $deleteStmt->execute(['userid' => $userid]);
+            $deleteStmt = $pdo->prepare('DELETE FROM usuario_tokens WHERE email = :email');
+            $deleteStmt->execute(['email' => $email]);
             
             // Insert the new token
             $insertStmt = $pdo->prepare('
-                INSERT INTO tokens (userid, token, is_valid)
-                VALUES (:userid, :token, TRUE)
+                INSERT INTO usuario_tokens (email, tipo_usuario, token, token_created, token_expires, token_used)
+                VALUES (:email, :tipo_usuario, :token, :token_created, :token_expires, 0)
             ');
             $insertStmt->execute([
-                'userid' => $userid,
+                'email' => $email,
+                'tipo_usuario' => $tipoUsuario,
                 'token' => $token,
+                'token_created' => $tokenCreated,
+                'token_expires' => $tokenExpires,
             ]);
             
             return $token;
@@ -111,6 +119,7 @@ class external_db {
 
     /**
      * Validate and retrieve a token record.
+     * Checks if token is valid, not expired, and not yet used.
      *
      * @param string $token The token to validate
      * @return object|false Token record if valid, false otherwise
@@ -118,11 +127,26 @@ class external_db {
      */
     public static function validate_token(string $token) {
         $pdo = self::get_connection();
-        $stmt = $pdo->prepare('SELECT id, userid, is_valid FROM tokens WHERE token = :token LIMIT 1');
+        $stmt = $pdo->prepare('
+            SELECT id, email, tipo_usuario, token, token_created, token_expires, token_used 
+            FROM usuario_tokens 
+            WHERE token = :token LIMIT 1
+        ');
         $stmt->execute(['token' => $token]);
         $row = $stmt->fetch();
         
-        if (!$row || !$row->is_valid) {
+        if (!$row) {
+            return false;
+        }
+        
+        // Check if token has been used
+        if ($row->token_used) {
+            return false;
+        }
+        
+        // Check if token has expired
+        $currentTime = time() * 1000; // current time in milliseconds
+        if ($currentTime > $row->token_expires) {
             return false;
         }
         
@@ -130,14 +154,54 @@ class external_db {
     }
 
     /**
-     * Invalidate a token.
+     * Mark a token as used (invalidate it).
      *
      * @param string $token The token to invalidate
      * @throws \PDOException
      */
     public static function invalidate_token(string $token): void {
         $pdo = self::get_connection();
-        $stmt = $pdo->prepare('UPDATE tokens SET is_valid = FALSE WHERE token = :token');
+        $stmt = $pdo->prepare('UPDATE usuario_tokens SET token_used = 1 WHERE token = :token');
         $stmt->execute(['token' => $token]);
+    }
+
+    /**
+     * Get the consent status of a student for a given forum.
+     *
+     * @param string $email The student's email
+     * @param string $forumid The forum ID
+     * @return int|null isConfirmed value (0 or 1), or null if not found
+     */
+    public static function get_student_consent(string $email, string $forumid): ?int {
+        $pdo = self::get_connection();
+        $stmt = $pdo->prepare('SELECT isConfirmed FROM foruns_estudantes WHERE Email = :email AND ForumID = :forumid LIMIT 1');
+        $stmt->execute(['email' => $email, 'forumid' => $forumid]);
+        $row = $stmt->fetch();
+
+        if (!$row) {
+            return null;
+        }
+
+        return (int) $row->isConfirmed;
+    }
+
+    /**
+     * Update the consent status of a student for a given forum.
+     *
+     * @param string $email The student's email
+     * @param string $forumid The forum ID
+     * @param int $isConfirmed 1 to consent, 0 to withdraw consent
+     * @return bool True if the record was updated, false if not found
+     */
+    public static function update_student_consent(string $email, string $forumid, int $isConfirmed): bool {
+        $pdo = self::get_connection();
+        $stmt = $pdo->prepare('UPDATE foruns_estudantes SET isConfirmed = :isConfirmed WHERE Email = :email AND ForumID = :forumid');
+        $stmt->execute([
+            'isConfirmed' => $isConfirmed,
+            'email' => $email,
+            'forumid' => $forumid,
+        ]);
+
+        return $stmt->rowCount() > 0;
     }
 }

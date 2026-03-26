@@ -24,4 +24,12 @@ $functions = [
         'type'        => 'write',
         'ajax'        => true,
     ],
+    'block_educolab_update_consent' => [
+        'classname'   => 'block_educolab\external\update_consent',
+        'methodname'  => 'update_consent',
+        'classpath'   => '',
+        'description' => 'Update student consent for forum participation',
+        'type'        => 'write',
+        'ajax'        => true,
+    ],
 ];
