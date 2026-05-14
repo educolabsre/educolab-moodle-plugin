@@ -10,21 +10,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 class external_db {
 
-    /** @var string Database host */
-    private const HOST = '172.18.12.13';
-
-    /** @var int Database port */
-    private const PORT = 3306;
-
-    /** @var string Database name */
-    private const DBNAME = 'educolab';
-
-    /** @var string Database user */
-    private const USER = 'educolab_user';
-
-    /** @var string Database password */
-    private const PASS = 'P1b1c-f4pdf';
-
     /**
      * Get a PDO connection to the external database.
      *
@@ -35,9 +20,14 @@ class external_db {
         static $pdo = null;
 
         if ($pdo === null) {
-            $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', self::HOST, self::PORT, self::DBNAME);
+            $host = getenv('EDUCOLAB_DB_HOST') ?: 'localhost';
+            $port = getenv('EDUCOLAB_DB_PORT') ?: '3306';
+            $dbname = getenv('EDUCOLAB_DB_NAME') ?: 'educolab';
+            $user = getenv('EDUCOLAB_DB_USER') ?: '';
+            $pass = getenv('EDUCOLAB_DB_PASS') ?: '';
+            $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $host, (int) $port, $dbname);
             try {
-                $pdo = new \PDO($dsn, self::USER, self::PASS, [
+                $pdo = new \PDO($dsn, $user, $pass, [
                     \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                     \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_OBJ,
                 ]);

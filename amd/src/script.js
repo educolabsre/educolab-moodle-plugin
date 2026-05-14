@@ -66,8 +66,9 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
 
             $(document).ready(function () {
                 const forumInfoElement = document.getElementById('forum-info');
+                const apiBaseUrl = forumInfoElement.dataset.apibaseurl;
 
-                const url = 'http://localhost:3000/checar-cadastro';
+                const url = apiBaseUrl + '/checar-cadastro';
 
                 fetch(url, {
                     method: 'POST',
@@ -132,7 +133,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                     const startDate = document.getElementById("start-date").value;
                     const endDate = document.getElementById("end-date").value;
 
-                    const url = forumCadastrado ? 'http://localhost:3000/atualizar-cadastro' : 'http://localhost:3000/cadastro';
+                    const url = forumCadastrado ? apiBaseUrl + '/atualizar-cadastro' : apiBaseUrl + '/cadastro';
 
                     const students = window.educolab.students;
 
@@ -213,7 +214,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                     
                     const forumInfoElement = document.getElementById('forum-info');
 
-                    const url = 'http://localhost:3000/analise';
+                    const url = apiBaseUrl + '/analise';
 
                     const messages = window.educolab.messages;
 
@@ -285,7 +286,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
                                 var username = result.username || '';
-                                var url = 'http://localhost:8501/?moodle_token=' + encodeURIComponent(token)
+                                var url = 'https://educolab.streamlit.app/?moodle_token=' + encodeURIComponent(token)
                                     + '&username=' + encodeURIComponent(username);
                                 window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                             } else {
@@ -311,7 +312,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
                                 var username = result.username || '';
-                                var url = 'http://localhost:8501/?moodle_token=' + encodeURIComponent(token)
+                                var url = 'https://educolab.streamlit.app/?moodle_token=' + encodeURIComponent(token)
                                     + '&forum_id=' + encodeURIComponent(forumId)
                                     + '&username=' + encodeURIComponent(username);
                                 window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');

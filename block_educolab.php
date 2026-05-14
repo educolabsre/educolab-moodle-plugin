@@ -130,6 +130,7 @@ class block_educolab extends block_base {
         }
 
         $plugin_context = [
+            'api_base_url' => getenv('EDUCOLAB_API_URL') ?: '',
             'identifica_forum' => $forum->name,
             'nome_professor' => $firstTeacher->firstname . ' ' . $firstTeacher->lastname,
             'email_professor' => $firstTeacher->email,

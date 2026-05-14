@@ -59,7 +59,7 @@ class schedule_analysis extends \core\task\scheduled_task {
             ));
 
             try {
-                $api_endpoint = "http://localhost:3000/analise";
+                $api_endpoint = (getenv('EDUCOLAB_API_URL') ?: '') . '/analise';
                 $post_data = [
                     'forumID' => $schedule->forumid,
                     'messages' => $csv_messages,
