@@ -1,0 +1,15 @@
+{
+  "name": "block_educolab",
+  "version": "0.1.3",
+  "description": "Build tools for block_educolab AMD modules",
+  "scripts": {
+    "build": "babel amd/src/script.js --presets @babel/preset-env | terser --compress --mangle -o amd/build/script.min.js",
+    "watch": "babel amd/src/script.js --presets @babel/preset-env --watch | terser --compress --mangle -o amd/build/script.min.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "terser": "^5.0.0"
+  }
+}
