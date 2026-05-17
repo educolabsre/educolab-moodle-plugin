@@ -7,21 +7,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
             }
             initialized = true;
 
-            const pages = {
-                initialState: document.getElementById('page-initialState'),
-                cadastro: document.getElementById('page-cadastro'),
-                analise: document.getElementById('page-analise'),
-                recorrencia: document.getElementById('page-recorrencia'),
-                personalizar: document.getElementById('page-personalizar'),
-                consentimento: document.getElementById('page-consentimento'),
-            };
-
             let forumCadastrado = false;
-
-            function switchPage(pageKey) {
-                Object.values(pages).forEach(page => page.classList.remove('active'));
-                pages[pageKey].classList.add('active');
-            }
 
             function showToast(message, status) {
                 const toastEl = document.getElementById("successToast");
@@ -65,6 +51,20 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
             }
 
             $(document).ready(function () {
+                const pages = {
+                    initialState: document.getElementById('page-initialState'),
+                    cadastro: document.getElementById('page-cadastro'),
+                    analise: document.getElementById('page-analise'),
+                    recorrencia: document.getElementById('page-recorrencia'),
+                    personalizar: document.getElementById('page-personalizar'),
+                    consentimento: document.getElementById('page-consentimento'),
+                };
+
+                function switchPage(pageKey) {
+                    Object.values(pages).forEach(page => page.classList.remove('active'));
+                    pages[pageKey].classList.add('active');
+                }
+
                 const forumInfoElement = document.getElementById('forum-info');
                 const apiBaseUrl = forumInfoElement.dataset.apibaseurl;
 
