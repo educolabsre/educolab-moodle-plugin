@@ -59,7 +59,11 @@ class schedule_analysis extends \core\task\scheduled_task {
             ));
 
             try {
-                $api_endpoint = (getenv('EDUCOLAB_API_URL') ?: '') . '/analise';
+                $base_url = get_config('block_educolab', 'api_url');
+                if (empty($base_url)) {
+                    throw new \Exception('EduColab API URL is not configured. Set it at Site Administration > Plugins > Blocks > EduColab.');
+                }
+                $api_endpoint = rtrim($base_url, '/') . '/analise';
                 $post_data = [
                     'forumID' => $schedule->forumid,
                     'messages' => $csv_messages,
@@ -73,7 +77,7 @@ class schedule_analysis extends \core\task\scheduled_task {
                 $DB->update_record('block_educolab_schedule', $schedule);
 
             } catch (\Exception $e) {
-                mtrace("Error processing forum {$forumid}: " . $e->getMessage());
+                mtrace("Error processing forum {$schedule->forumid}: " . $e->getMessage());
             }
         }
     }

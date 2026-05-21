@@ -37,3 +37,5 @@ $string['selectoption'] = 'Select an option';
 $string['option1'] = 'Option 1';
 $string['option2'] = 'Option 2';
 $string['option3'] = 'Option 3';
+$string['settings_api_url'] = 'EduColab API URL';
+$string['settings_api_url_desc'] = 'The base URL of the EduColab analysis API (e.g. http://api.example.com:8000).';

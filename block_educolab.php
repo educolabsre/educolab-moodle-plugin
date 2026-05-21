@@ -25,6 +25,10 @@ class block_educolab extends block_base {
         $this->title = get_string('pluginname', 'block_educolab');
     }
 
+    public function has_config() {
+        return true;
+    }
+
     public function applicable_formats() {
         return ['all' => true];
     }
