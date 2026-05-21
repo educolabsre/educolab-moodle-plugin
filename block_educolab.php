@@ -149,6 +149,7 @@ class block_educolab extends block_base {
             'is_teacher' => $is_teacher,
             'student_enrolled' => $student_enrolled,
             'student_consented' => $student_consented,
+            'streamlit_url' => get_config('block_educolab', 'streamlit_url'),
         ];
         
         $this->content->text = $OUTPUT->render_from_template('block_educolab/index', $plugin_context);

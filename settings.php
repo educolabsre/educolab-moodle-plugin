@@ -30,4 +30,11 @@ if ($ADMIN->fulltree) {
         '',
         PARAM_URL
     ));
+    $settings->add(new admin_setting_configtext(
+        'block_educolab/streamlit_url',
+        get_string('settings_streamlit_url', 'block_educolab'),
+        get_string('settings_streamlit_url_desc', 'block_educolab'),
+        '',
+        PARAM_URL
+    ));
 }

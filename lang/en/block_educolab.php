@@ -39,3 +39,5 @@ $string['option2'] = 'Option 2';
 $string['option3'] = 'Option 3';
 $string['settings_api_url'] = 'EduColab API URL';
 $string['settings_api_url_desc'] = 'The base URL of the EduColab analysis API (e.g. http://api.example.com:8000).';
+$string['settings_streamlit_url'] = 'Streamlit App URL';
+$string['settings_streamlit_url_desc'] = 'The base URL of the Streamlit recommendations app (e.g. https://educolab.streamlit.app).';

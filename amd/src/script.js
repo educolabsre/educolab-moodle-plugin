@@ -286,7 +286,8 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
                                 var username = result.username || '';
-                                var url = 'https://educolab.streamlit.app/?moodle_token=' + encodeURIComponent(token)
+                                var streamlitUrl = forumInfoElement.dataset.streamliturl || 'https://educolab.streamlit.app';
+                                var url = streamlitUrl + '/?moodle_token=' + encodeURIComponent(token)
                                     + '&username=' + encodeURIComponent(username);
                                 window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                             } else {
@@ -312,7 +313,8 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
                                 var username = result.username || '';
-                                var url = 'https://educolab.streamlit.app/?moodle_token=' + encodeURIComponent(token)
+                                var streamlitUrl = forumInfoElement.dataset.streamliturl || 'https://educolab.streamlit.app';
+                                var url = streamlitUrl + '/?moodle_token=' + encodeURIComponent(token)
                                     + '&forum_id=' + encodeURIComponent(forumId)
                                     + '&username=' + encodeURIComponent(username);
                                 window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
