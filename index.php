@@ -1,10 +1,15 @@
 <?php
 require_once('../../config.php');
 
+require_login();
+require_sesskey();
+$context = context_system::instance();
+require_capability('block/educolab:addinstance', $context);
+
 $action = required_param('action', PARAM_ALPHA);
 
 if ($action === 'schedule') {
-    $start_date = "2025-01-02";
+    $start_date = '2025-01-02';
     $interval = 1;
 
     $start_timestamp = strtotime($start_date);
@@ -17,5 +22,4 @@ if ($action === 'schedule') {
     $task->set_next_run_time($start_timestamp);
     \core\task\manager::save_scheduled_task($task);
 
-    echo "Task scheduled successfully starting from $start_date every $interval minutes.";
 }
