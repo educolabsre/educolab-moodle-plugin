@@ -10,7 +10,7 @@ $action = required_param('action', PARAM_ALPHA);
 
 if ($action === 'schedule') {
     $start_date = '2025-01-02';
-    $interval = 1;
+    // $interval = 1;
 
     $start_timestamp = strtotime($start_date);
 
