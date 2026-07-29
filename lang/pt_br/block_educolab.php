@@ -87,7 +87,7 @@ $string['monthly'] = 'Mensal';
 $string['start_on'] = 'Iniciar em';
 $string['save'] = 'Salvar';
 
-$string['customize_text_settings'] = 'É possível personalizar o texto nas configurações do bloco.';
+$string['customize_text_settings'] = 'É possível personalizar o texto do e-mail nas configurações';
 $string['confirmation_email_variables'] = 'Para o e-mail de confirmação, as variáveis';
 $string['student_name'] = 'Nome do estudante';
 $string['forum_name'] = 'Nome do fórum';
