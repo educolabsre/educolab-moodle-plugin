@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * External function to save recommendation text for block_educolab.
+ * External function to generate token for block_educolab.
  *
  * @package   block_educolab
  * @copyright 2024 Gabriel Lima <gabriel.lima6@estudante.ifb.edu.br>
