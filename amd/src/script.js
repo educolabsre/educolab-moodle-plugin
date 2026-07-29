@@ -1,7 +1,7 @@
-define(['jquery', 'core/ajax'], function($, Ajax) {
+define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
     let initialized = false;
     return {
-        init: function() {
+        init: function () {
             if (initialized) {
                 return;
             }
@@ -12,7 +12,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
             function showToast(message, status) {
                 const toastEl = document.getElementById("successToast");
                 if (!toastEl) return; // Guard against missing element
-                
+
                 const toastHeader = document.querySelector(".toast-header");
                 const toastHeaderTitle = document.getElementById("toast-header-title");
                 const toastBody = document.querySelector(".toast-body");
@@ -35,7 +35,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
 
                 toastHeader.classList.remove(status == "success" ? statusClasses.error.header.name : statusClasses.success.header.name);
                 toastHeader.classList.add(statusClasses?.[status].header.name);
-                
+
                 toastBody.innerHTML = message;
                 toastHeaderTitle.innerHTML = status == "success" ? "Sucesso" : "Erro";
 
@@ -79,48 +79,50 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                         forumID: forumInfoElement.dataset.forumid
                     })
                 })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    
-                    return response.json();
-                })
-                .then((data) => {
-                    if(!!data) {
-                        const firstOption = document.getElementById('monitoramento');
-                        firstOption.innerHTML = "Editar monitoramento";
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
 
-                        const buttonText = document.getElementById('button-monitoramento');
-                        buttonText.innerHTML = "Editar monitoramento";
-    
-                        document.querySelectorAll('.list-group-item').forEach((item) => item.classList.remove('disabled'));
+                        return response.json();
+                    })
+                    .then(async (data) => {
+                        if (data) {
+                            const text = await Str.get_string(
+                                'edit_monitoring',
+                                'block_educolab'
+                            );
 
-                        const firstDateInput = document.getElementById('start-date-input');
-                        firstDateInput.classList.add('page');
+                            document.getElementById('monitoramento').innerHTML = text;
+                            document.getElementById('button-monitoramento').innerHTML = text;
 
-                        forumCadastrado = true;
+                            document.querySelectorAll('.list-group-item')
+                                .forEach((item) => item.classList.remove('disabled'));
 
-                    } else {
-                        forumCadastrado = false;
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+                            document.getElementById('start-date-input')
+                                .classList.add('page');
 
-                $('.close').on('click', function() {
+                            forumCadastrado = true;
+                        } else {
+                            forumCadastrado = false;
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+
+                $('.close').on('click', function () {
                     const toastEl = document.getElementById("successToast");
                     toastEl.classList.remove('show');
                     toastEl.style.display = 'none';
                 });
 
-                $('#cadastro').on('click', function() {
+                $('#cadastro').on('click', function () {
                     switchPage('cadastro');
                     document.getElementById('back-arrow').classList.add('active');
                 });
 
-                $('#btn-cadastro').on('click', function() {
+                $('#btn-cadastro').on('click', function () {
                     const button = document.getElementById("btn-cadastro");
 
                     button.setAttribute('disabled', 'true');
@@ -167,58 +169,61 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                         },
                         body: reqBody
                     })
-                    .then(response => {
-                        if(!response.ok) {
-                            throw new Error('Request error');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        button.querySelector('.spinner-border').classList.add('d-none');
-                        button.removeAttribute('disabled');
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Request error');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            button.querySelector('.spinner-border').classList.add('d-none');
+                            button.removeAttribute('disabled');
 
-                        if(data?.error) {
-                            showToast(data?.error, "error");
+                            if (data?.error) {
+                                showToast(data?.error, "error");
 
-                        } else if(data?.success) {
-                            showToast(data?.success, "success");
+                            } else if (data?.success) {
+                                showToast(data?.success, "success");
 
-                            document.querySelectorAll('.list-group-item').forEach((item) => item.classList.remove('disabled'));
-                            document.getElementById('back-arrow').classList.remove('active');
+                                document.querySelectorAll('.list-group-item').forEach((item) => item.classList.remove('disabled'));
+                                document.getElementById('back-arrow').classList.remove('active');
 
-                            const firstOption = document.getElementById('monitoramento');
-                            firstOption.innerHTML = "Editar monitoramento";
+                                Str.get_string('edit_monitoring', 'block_educolab')
+                                    .then(function (text) {
+                                        document.getElementById('monitoramento').innerHTML = text;
+                                        document.getElementById('button-monitoramento').innerHTML = text;
+                                    });
 
-                            switchPage('initialState');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error', error);
-                    })
-                    .finally(() => {
-                        button.querySelector('.spinner-border').classList.add('d-none');
-                        button.removeAttribute('disabled');
-                    });
+                                switchPage('initialState');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error', error);
+                        })
+                        .finally(() => {
+                            button.querySelector('.spinner-border').classList.add('d-none');
+                            button.removeAttribute('disabled');
+                        });
                 });
 
-                $('#analise').on('click', function() {
+                $('#analise').on('click', function () {
                     switchPage('analise');
                     document.getElementById('back-arrow').classList.add('active');
                 });
 
-                $('#btn-analise').on('click', function() {
+                $('#btn-analise').on('click', function () {
                     const button = document.getElementById("btn-analise");
 
                     button.setAttribute('disabled', 'true');
                     button.querySelector('.spinner-border').classList.remove('d-none');
-                    
+
                     const forumInfoElement = document.getElementById('forum-info');
 
                     const url = apiBaseUrl + '/analise';
 
                     const messages = window.educolab.messages;
 
-                    const csv_header = ["id","discussion","parent","userid","userfullname","created","modified","mailed","subject","message","wordcount"];
+                    const csv_header = ["id", "discussion", "parent", "userid", "userfullname", "created", "modified", "mailed", "subject", "message", "wordcount"];
                     const csv_rows = messages.map(message => [message.id, message.discussion, message.parent, message.userid, message.userfullname, message.created, message.modified, message.mailed, message.subject, message.message, message.wordcount]);
 
                     const csv_messages = [
@@ -236,53 +241,53 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                             messages: csv_messages
                         })
                     })
-                    .then(response => {
-                        if(!response.ok) {
-                            throw new Error('Request error');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log(data);
-                        
-                        button.querySelector('.spinner-border').classList.add('d-none');
-                        button.removeAttribute('disabled');
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Request error');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log(data);
 
-                        if(data?.error) {
-                            showToast(data?.error, "error");
+                            button.querySelector('.spinner-border').classList.add('d-none');
+                            button.removeAttribute('disabled');
 
-                        } else if(data?.success) {
-                            showToast(data?.success, "success");
+                            if (data?.error) {
+                                showToast(data?.error, "error");
 
-                            document.getElementById('back-arrow').classList.remove('active');
+                            } else if (data?.success) {
+                                showToast(data?.success, "success");
 
-                            switchPage('initialState');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error', error);
-                    })
-                    .finally(() => {
-                        button.querySelector('.spinner-border').classList.add('d-none');
-                        button.removeAttribute('disabled');
-                    });
+                                document.getElementById('back-arrow').classList.remove('active');
+
+                                switchPage('initialState');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error', error);
+                        })
+                        .finally(() => {
+                            button.querySelector('.spinner-border').classList.add('d-none');
+                            button.removeAttribute('disabled');
+                        });
                 });
 
-                $('#recorrencia').on('click', function() {
+                $('#recorrencia').on('click', function () {
                     switchPage('recorrencia');
                     document.getElementById('back-arrow').classList.add('active');
                 });
 
-                $('#personalizar').on('click', function() {
+                $('#personalizar').on('click', function () {
                     switchPage('personalizar');
                     document.getElementById('back-arrow').classList.add('active');
                 });
 
-                $('#ver-recomendacao').on('click', function() {
+                $('#ver-recomendacao').on('click', function () {
                     Ajax.call([{
                         methodname: 'block_educolab_generate_token',
                         args: {},
-                        done: function(result) {
+                        done: function (result) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
                                 var username = result.username || '';
@@ -294,7 +299,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                                 showToast('Erro ao gerar token de acesso.', 'error');
                             }
                         },
-                        fail: function(error) {
+                        fail: function (error) {
                             showToast('Falha ao gerar token. Tente novamente mais tarde.', 'error');
                             console.error('Token generation error:', error);
                         }
@@ -302,14 +307,14 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 });
 
                 // Student: View last recommendation (same behavior as teacher, with forumId)
-                $('#ver-recomendacao-aluno').on('click', function() {
+                $('#ver-recomendacao-aluno').on('click', function () {
                     var forumInfoElement = document.getElementById('forum-info');
                     var forumId = forumInfoElement.dataset.forumid;
 
                     Ajax.call([{
                         methodname: 'block_educolab_generate_token',
                         args: {},
-                        done: function(result) {
+                        done: function (result) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
                                 var username = result.username || '';
@@ -322,7 +327,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                                 showToast('Erro ao gerar token de acesso.', 'error');
                             }
                         },
-                        fail: function(error) {
+                        fail: function (error) {
                             showToast('Falha ao gerar token. Tente novamente mais tarde.', 'error');
                             console.error('Token generation error:', error);
                         }
@@ -330,13 +335,13 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 });
 
                 // Student: Open consent page
-                $('#atualizar-consentimento').on('click', function() {
+                $('#atualizar-consentimento').on('click', function () {
                     switchPage('consentimento');
                     document.getElementById('back-arrow').classList.add('active');
                 });
 
                 // Student: Consent button
-                $('#btn-consentir').on('click', function() {
+                $('#btn-consentir').on('click', function () {
                     var button = document.getElementById('btn-consentir');
                     button.setAttribute('disabled', 'true');
                     button.querySelector('.spinner-border').classList.remove('d-none');
@@ -347,7 +352,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                     Ajax.call([{
                         methodname: 'block_educolab_update_consent',
                         args: { forumId: forumId, consent: 1 },
-                        done: function(result) {
+                        done: function (result) {
                             button.querySelector('.spinner-border').classList.add('d-none');
                             button.removeAttribute('disabled');
 
@@ -358,7 +363,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                                 showToast(result.message, 'error');
                             }
                         },
-                        fail: function(error) {
+                        fail: function (error) {
                             button.querySelector('.spinner-border').classList.add('d-none');
                             button.removeAttribute('disabled');
                             showToast('Erro ao atualizar consentimento. Tente novamente.', 'error');
@@ -368,7 +373,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 });
 
                 // Student: Withdraw consent button
-                $('#btn-nao-consentir').on('click', function() {
+                $('#btn-nao-consentir').on('click', function () {
                     var button = document.getElementById('btn-nao-consentir');
                     button.setAttribute('disabled', 'true');
                     button.querySelector('.spinner-border').classList.remove('d-none');
@@ -379,7 +384,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                     Ajax.call([{
                         methodname: 'block_educolab_update_consent',
                         args: { forumId: forumId, consent: 0 },
-                        done: function(result) {
+                        done: function (result) {
                             button.querySelector('.spinner-border').classList.add('d-none');
                             button.removeAttribute('disabled');
 
@@ -390,7 +395,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                                 showToast(result.message, 'error');
                             }
                         },
-                        fail: function(error) {
+                        fail: function (error) {
                             button.querySelector('.spinner-border').classList.add('d-none');
                             button.removeAttribute('disabled');
                             showToast('Erro ao atualizar consentimento. Tente novamente.', 'error');
@@ -407,20 +412,20 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                     }
                 }
 
-                $('#back-arrow').on('click', function() {
+                $('#back-arrow').on('click', function () {
                     switchPage('initialState');
                     document.getElementById('back-arrow').classList.remove('active');
                 });
 
-                $('#save-schedule-btn').on('click', function() {
+                $('#save-schedule-btn').on('click', function () {
                     const recurrence = $('#interval').val();
                     const startDate = $('#start_date').val();
-    
+
                     const forumInfoElement = document.getElementById('forum-info');
-    
+
                     const forumId = forumInfoElement.dataset.forumid;
                     const courseId = forumInfoElement.dataset.courseid;
-    
+
                     if (!recurrence || !startDate) {
                         alert(Str.get_string('fillallfields', 'block_educolab'));
                         return;
@@ -433,7 +438,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                         three_weeks: "a cada três semanas",
                         monthly: "mensalmente"
                     }
-    
+
                     Ajax.call([{
                         methodname: 'block_educolab_save_schedule',
                         args: {
@@ -442,12 +447,12 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                             recurrence: recurrence,
                             start_date: startDate
                         },
-                        done: function() {
+                        done: function () {
                             showToast(`O fórum será analisado ${intervalsText?.[recurrence]}, a partir de ${startDate.split('-').reverse().join('/')}.`, "success");
                             switchPage('initialState');
                             document.getElementById('back-arrow').classList.remove('active');
                         },
-                        fail: function(error) {
+                        fail: function (error) {
                             showToast('Não foi possível agendar as análises, tente novamente mais tarde.')
                             console.log(error);
                         }

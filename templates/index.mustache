@@ -330,3 +330,39 @@
     </div>
   </div>
 </div>
+
+<div aria-live="polite" aria-atomic="true" class="position-fixed" style="bottom: 16px; right: 16px; z-index: 9999;">
+  <div class="toast toast-success" role="alert" aria-live="assertive" aria-atomic="true" id="successToast">
+    <div class="toast-header toast-header-success">
+      <strong class="mr-auto" id='toast-header-title'>Titulo</strong>
+      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="toast-body">
+      Mensagem
+    </div>
+  </div>
+</div>
+<script>
+  window.educolab = window.educolab || {};
+
+  window.educolab.students = JSON.parse("{{ estudantes }}".replace(/&quot;/g, '"'));
+  window.educolab.messages = JSON.parse("{{ messages }}".replace(/&quot;/g, '"'));
+  window.educolab.isTeacher = {{is_teacher}};
+
+  console.log('EduColab is_teacher:', window.educolab.isTeacher);
+
+  function validateDates() {
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+
+    if (startDate) {
+      document.getElementById("end-date").setAttribute("min", startDate);
+    }
+
+    if (endDate) {
+      document.getElementById("start-date").setAttribute("max", endDate);
+    }
+  }
+</script>
