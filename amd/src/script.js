@@ -9,7 +9,16 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
 
             let forumCadastrado = false;
 
-            function showToast(message, status) {
+            async function getBlockString(key, fallback) {
+                try {
+                    return await Str.get_string(key, 'block_educolab');
+                } catch (error) {
+                    console.warn(error);
+                    return fallback || key;
+                }
+            }
+
+            async function showToast(message, status) {
                 const toastEl = document.getElementById("successToast");
                 if (!toastEl) return; // Guard against missing element
 
@@ -30,6 +39,8 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                     },
                 };
 
+                const title = await getBlockString(status === "success" ? "success" : "error", status === "success" ? "Success" : "Error");
+
                 toastEl.classList.remove(status == "success" ? statusClasses.error.name : statusClasses.success.name);
                 toastEl.classList.add(statusClasses?.[status].name);
 
@@ -37,7 +48,7 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                 toastHeader.classList.add(statusClasses?.[status].header.name);
 
                 toastBody.innerHTML = message;
-                toastHeaderTitle.innerHTML = status == "success" ? "Sucesso" : "Erro";
+                toastHeaderTitle.innerHTML = title;
 
                 // Show the toast
                 toastEl.classList.add('show');
@@ -287,7 +298,7 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                     Ajax.call([{
                         methodname: 'block_educolab_generate_token',
                         args: {},
-                        done: function (result) {
+                        done: async function (result) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
                                 var username = result.username || '';
@@ -296,11 +307,11 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                                     + '&username=' + encodeURIComponent(username);
                                 window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                             } else {
-                                showToast('Erro ao gerar token de acesso.', 'error');
+                                showToast(await getBlockString('token_generation_error', 'Error generating access token.'), 'error');
                             }
                         },
-                        fail: function (error) {
-                            showToast('Falha ao gerar token. Tente novamente mais tarde.', 'error');
+                        fail: async function (error) {
+                            showToast(await getBlockString('token_generation_failed', 'Token generation failed. Please try again later.'), 'error');
                             console.error('Token generation error:', error);
                         }
                     }]);
@@ -314,7 +325,7 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                     Ajax.call([{
                         methodname: 'block_educolab_generate_token',
                         args: {},
-                        done: function (result) {
+                        done: async function (result) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
                                 var username = result.username || '';
@@ -324,11 +335,11 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                                     + '&username=' + encodeURIComponent(username);
                                 window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                             } else {
-                                showToast('Erro ao gerar token de acesso.', 'error');
+                                showToast(await getBlockString('token_generation_error', 'Error generating access token.'), 'error');
                             }
                         },
-                        fail: function (error) {
-                            showToast('Falha ao gerar token. Tente novamente mais tarde.', 'error');
+                        fail: async function (error) {
+                            showToast(await getBlockString('token_generation_failed', 'Token generation failed. Please try again later.'), 'error');
                             console.error('Token generation error:', error);
                         }
                     }]);
@@ -352,7 +363,7 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                     Ajax.call([{
                         methodname: 'block_educolab_update_consent',
                         args: { forumId: forumId, consent: 1 },
-                        done: function (result) {
+                        done: async function (result) {
                             button.querySelector('.spinner-border').classList.add('d-none');
                             button.removeAttribute('disabled');
 
@@ -363,10 +374,10 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                                 showToast(result.message, 'error');
                             }
                         },
-                        fail: function (error) {
+                        fail: async function (error) {
                             button.querySelector('.spinner-border').classList.add('d-none');
                             button.removeAttribute('disabled');
-                            showToast('Erro ao atualizar consentimento. Tente novamente.', 'error');
+                            showToast(await getBlockString('consent_update_error', 'Error updating consent. Please try again.'), 'error');
                             console.error('Consent update error:', error);
                         }
                     }]);
@@ -404,11 +415,13 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                     }]);
                 });
 
-                function updateConsentBadge(consented) {
+                async function updateConsentBadge(consented) {
                     var badge = document.querySelector('#consent-status .badge');
                     if (badge) {
+                        const currentStatusLabel = await getBlockString('current_status', 'Current status');
+                        const consentedLabel = await getBlockString(consented ? 'consented' : 'not_consented', consented ? 'Consented' : 'Not consented');
                         badge.className = 'badge ' + (consented ? 'badge-success' : 'badge-secondary');
-                        badge.textContent = 'Status atual: ' + (consented ? 'Consentido' : 'Não consentido');
+                        badge.textContent = currentStatusLabel + ': ' + consentedLabel;
                     }
                 }
 
@@ -417,7 +430,7 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                     document.getElementById('back-arrow').classList.remove('active');
                 });
 
-                $('#save-schedule-btn').on('click', function () {
+                $('#save-schedule-btn').on('click', async function () {
                     const recurrence = $('#interval').val();
                     const startDate = $('#start_date').val();
 
@@ -427,17 +440,24 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                     const courseId = forumInfoElement.dataset.courseid;
 
                     if (!recurrence || !startDate) {
-                        alert(Str.get_string('fillallfields', 'block_educolab'));
+                        showToast(await getBlockString('fillallfields', 'Please fill all fields.'), 'error');
                         return;
                     }
 
-                    const intervalsText = {
-                        daily: "diariamente",
-                        weekly: "semanalmente",
-                        two_weeks: "a cada duas semanas",
-                        three_weeks: "a cada três semanas",
-                        monthly: "mensalmente"
-                    }
+                    const intervalKey = {
+                        daily: 'daily',
+                        weekly: 'weekly',
+                        two_weeks: 'two_weeks',
+                        three_weeks: 'three_weeks',
+                        monthly: 'monthly'
+                    }[recurrence] || 'daily';
+
+                    const intervalLabel = await getBlockString(intervalKey, recurrence);
+                    const formattedDate = startDate.split('-').reverse().join('/');
+                    const scheduleMessageTemplate = await getBlockString('forum_will_be_analyzed', 'The forum will be analyzed {$a->interval} starting on {$a->date}.');
+                    const scheduleMessage = scheduleMessageTemplate
+                        .replace('{$a->interval}', intervalLabel)
+                        .replace('{$a->date}', formattedDate);
 
                     Ajax.call([{
                         methodname: 'block_educolab_save_schedule',
@@ -448,12 +468,12 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                             start_date: startDate
                         },
                         done: function () {
-                            showToast(`O fórum será analisado ${intervalsText?.[recurrence]}, a partir de ${startDate.split('-').reverse().join('/')}.`, "success");
+                            showToast(scheduleMessage, "success");
                             switchPage('initialState');
                             document.getElementById('back-arrow').classList.remove('active');
                         },
-                        fail: function (error) {
-                            showToast('Não foi possível agendar as análises, tente novamente mais tarde.')
+                        fail: async function (error) {
+                            showToast(await getBlockString('schedule_failed', 'Could not schedule analyses. Please try again later.'), 'error');
                             console.log(error);
                         }
                     }]);
