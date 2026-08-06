@@ -133,16 +133,18 @@ class block_educolab extends block_base {
             $student_consented = ($consent === 1);
         }
 
+        $jsonflags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+
         $plugin_context = [
             'api_base_url' => getenv('EDUCOLAB_API_URL') ?: '',
             'identifica_forum' => $forum->name,
             'nome_professor' => $firstTeacher->firstname . ' ' . $firstTeacher->lastname,
             'email_professor' => $firstTeacher->email,
             'link_forum' => $CFG->wwwroot . '/' . $forum_url,
-            'estudantes' => json_encode($students_data),
+            'estudantes' => json_encode($students_data, $jsonflags),
             'forumID' => $course_module->id,
             'courseID' => $COURSE->id,
-            'messages' => json_encode($messages),
+            'messages' => json_encode($messages, $jsonflags),
             'forum_end_date' => $forum_dates ? date('Y-m-d', $forum_dates->end_date) : "",
             'scheduled_start_date' => $forum_schedule ? date('Y-m-d', $forum_schedule->end_date) : "",
             'confirmation_text' => $rendered_text,
