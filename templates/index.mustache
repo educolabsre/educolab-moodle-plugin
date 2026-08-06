@@ -347,11 +347,9 @@
 <script>
   window.educolab = window.educolab || {};
 
-  window.educolab.students = JSON.parse("{{ estudantes }}".replace(/&quot;/g, '"'));
-  window.educolab.messages = JSON.parse("{{ messages }}".replace(/&quot;/g, '"'));
+  window.educolab.students = {{{ estudantes }}};
+  window.educolab.messages = {{{ messages }}};
   window.educolab.isTeacher = {{is_teacher}};
-
-  console.log('EduColab is_teacher:', window.educolab.isTeacher);
 
   function validateDates() {
     const startDate = document.getElementById("start-date").value;
