@@ -52,6 +52,8 @@ $string['confirmation_email'] = 'E-mail de confirmação';
 
 $string['start_monitoring'] = 'Iniciar monitoramento';
 $string['edit_monitoring'] = 'Editar monitoramento';
+$string['sync_students'] = 'Atualizar lista de alunos';
+$string['sync_students_desc'] = 'Sincronizar novas matrículas no monitoramento';
 
 $string['analyze_forum'] = 'Analisar fórum';
 $string['request_immediate_analysis'] = 'Solicitar análise imediata';

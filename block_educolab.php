@@ -118,8 +118,10 @@ class block_educolab extends block_base {
         $forum_schedule = $DB->get_record('block_educolab_schedule', ['forumid' => $course_module->id]);
         $forum_recommendations = $DB->get_record('block_educolab_recommendations', ['forumid' => $course_module->id]);
 
-        $confirmation_text = isset($this->config->confirmation_text['text']) ? $this->config->confirmation_text['text'] : '';
-        $confirmation_text_format = isset($this->config->confirmation_text_format['format']) ? $this->config->confirmation_text_format['format'] : FORMAT_HTML;
+        require_once(__DIR__ . '/lib.php');
+        $confirmation_text = !empty($this->config->confirmation_text['text'])
+            ? $this->config->confirmation_text['text'] : block_educolab_default_confirmation_text();
+        $confirmation_text_format = $this->config->confirmation_text['format'] ?? FORMAT_HTML;
 
         $rendered_text = format_text($confirmation_text, $confirmation_text_format);
 
@@ -140,7 +142,9 @@ class block_educolab extends block_base {
             'identifica_forum' => $forum->name,
             'nome_professor' => $firstTeacher->firstname . ' ' . $firstTeacher->lastname,
             'email_professor' => $firstTeacher->email,
+            'teacher_emails' => json_encode(block_educolab_get_teacher_emails($COURSE->id), $jsonflags),
             'link_forum' => $CFG->wwwroot . '/' . $forum_url,
+            'link_curso' => (new moodle_url('/course/view.php', ['id' => $COURSE->id]))->out(false),
             'estudantes' => json_encode($students_data, $jsonflags),
             'forumID' => $course_module->id,
             'courseID' => $COURSE->id,

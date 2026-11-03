@@ -35,14 +35,16 @@ use external_value;
 
 class generate_token extends external_api {
     public static function generate_token_parameters() {
-        return new external_function_parameters([]);
+        return new external_function_parameters([
+            'courseId' => new external_value(PARAM_INT, 'Course context for the user role'),
+        ]);
     }
 
-    public static function generate_token() {
+    public static function generate_token($courseid) {
         global $USER, $DB, $COURSE;
 
         // Validate parameters
-        self::validate_parameters(self::generate_token_parameters(), []);
+        $params = self::validate_parameters(self::generate_token_parameters(), ['courseId' => $courseid]);
 
         // Require authentication - check that user is logged in
         if (!isloggedin() || isguestuser()) {
@@ -50,7 +52,10 @@ class generate_token extends external_api {
         }
 
         // Determine user type based on capability (same logic as block interface)
-        $context = \context_course::instance($COURSE->id);
+        $course = get_course($params['courseId']);
+        require_login($course);
+        $context = \context_course::instance($course->id);
+        self::validate_context($context);
         $is_teacher = has_capability('moodle/course:manageactivities', $context);
         $tipoUsuario = $is_teacher ? 'professor' : 'aluno';
 
