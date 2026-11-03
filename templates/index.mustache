@@ -17,7 +17,9 @@
   data-identificaforum="{{identifica_forum}}"
   data-nomeprofessor="{{nome_professor}}"
   data-linkforum="{{link_forum}}"
+  data-linkcurso="{{link_curso}}"
   data-emailprofessor="{{email_professor}}"
+  data-teacheremails="{{teacher_emails}}"
   data-confirmacao="{{confirmation_text}}"
   data-apibaseurl="{{api_base_url}}"
   data-streamliturl="{{streamlit_url}}"
@@ -33,6 +35,19 @@
     <span id="monitoramento"
       >{{#str}} start_monitoring, block_educolab {{/str}}</span
     >
+    <i class="bi bi-chevron-right"></i>
+  </button>
+
+  <button
+    class="list-group-item list-group-item-action border-0 px-0 d-flex align-items-center justify-content-between disabled"
+    id="atualizar-estudantes"
+  >
+    <div>
+      {{#str}} sync_students, block_educolab {{/str}}
+      <small class="d-block text-muted"
+        >{{#str}} sync_students_desc, block_educolab {{/str}}</small
+      >
+    </div>
     <i class="bi bi-chevron-right"></i>
   </button>
 

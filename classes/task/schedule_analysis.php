@@ -32,14 +32,18 @@ class schedule_analysis extends \core\task\scheduled_task {
 
     public function execute() {
         global $DB;
+        require_once(__DIR__ . '/../../lib.php');
 
         $schedules = $DB->get_records_select('block_educolab_schedule', 'nextrun <= :now', ['now' => time()]);
 
         foreach ($schedules as $schedule) {
-            $forums = $DB->get_records('forum', ['course' => $schedule->courseid]);
-            $firstForum = reset($forums);
+            $course_module = get_coursemodule_from_id('forum', $schedule->forumid, $schedule->courseid);
+            if (!$course_module) {
+                mtrace("Invalid forum module {$schedule->forumid} for course {$schedule->courseid}");
+                continue;
+            }
             
-            $discussions = $DB->get_records('forum_discussions', ['forum' => $firstForum->id]);
+            $discussions = $DB->get_records('forum_discussions', ['forum' => $course_module->instance]);
             
             $messages = [];
             
@@ -71,14 +75,14 @@ class schedule_analysis extends \core\task\scheduled_task {
             
             $csv_header = ['id', 'discussion', 'parent', 'userid', 'userfullname', 'created', 'modified', 'mailed', 'subject', 'message', 'wordcount'];
 
-            $csv_rows = array_map(function ($message) {
-                return implode(',', array_map('strval', $message));
-            }, $messages);
-
-            $csv_messages = implode("\n", array_merge(
-                [implode(',', $csv_header)],
-                $csv_rows                    
-            ));
+            $csv_stream = fopen('php://temp', 'r+');
+            fputcsv($csv_stream, $csv_header, ',', '"', '');
+            foreach ($messages as $message) {
+                fputcsv($csv_stream, array_values($message), ',', '"', '');
+            }
+            rewind($csv_stream);
+            $csv_messages = stream_get_contents($csv_stream);
+            fclose($csv_stream);
 
             try {
                 $base_url = get_config('block_educolab', 'api_url');
@@ -89,6 +93,9 @@ class schedule_analysis extends \core\task\scheduled_task {
                 $post_data = [
                     'forumID' => $schedule->forumid,
                     'messages' => $csv_messages,
+                    'teacher_emails' => block_educolab_get_teacher_emails($schedule->courseid),
+                    'confirmacao' => block_educolab_get_confirmation_text($schedule->forumid, $schedule->courseid),
+                    'link_curso' => (new \moodle_url('/course/view.php', ['id' => $schedule->courseid]))->out(false),
                 ];
 
                 $this->call_api($api_endpoint, $post_data);

@@ -48,16 +48,12 @@ class save_recommendation extends external_api {
             'forumid' => $forumid,
             'confirmation_text' => $confirmation_text,
         ]);
+        require_once(__DIR__ . '/../../lib.php');
 
         $recommendation_parameters = [
             'forumid' => $params['forumid'],
-            'confirmation_text' => $params['confirmation_text'] == "" ? "Olá, ['Nome']!<br><br>Seu professor pediu para enviarmos recomendações a você e seus 
-                    colegas a fim de promover a aprendizagem por meio do debate entre vocês no fórum ['identifica_fórum']. 
-                    Para enviarmos essas recomendações é necessário que você nos permita fazer isso, clicando neste 
-                    ['link'].<br><br>Em caso de recusa, 
-                    você não será penalizado(a) de forma alguma. Se tiver alguma dúvida ou sugestão, você poderá entrar em contato 
-                    com os desenvolvedores responsáveis através do e-mail educolabsre@gmail.com.<br><br>Vambora aprender colaborando com a sua turma 
-                    e ainda participar desta oportunidade científica de aplicação da inteligência artificial na educação?" : $params['confirmation_text']
+            'confirmation_text' => $params['confirmation_text'] == ""
+                ? \block_educolab_default_confirmation_text() : $params['confirmation_text']
         ];
 
         $existing = $DB->get_record('block_educolab_recommendations', ['forumid' => $params['forumid']]);

@@ -2,6 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/blocks/edit_form.php');
+require_once(__DIR__ . '/lib.php');
 
 class block_educolab_edit_form extends block_edit_form {
     protected function specific_definition($mform) {
@@ -27,13 +28,7 @@ class block_educolab_edit_form extends block_edit_form {
         $mform->addRule('config_confirmation_text', null, 'required', null, 'client');
 
         $defaulttext = [
-            'text' => "Olá, ['Nome']!<br><br>Seu professor pediu para enviarmos recomendações a você e seus 
-                    colegas a fim de promover a aprendizagem por meio do debate entre vocês no fórum ['identifica_forum']. 
-                    Para enviarmos essas recomendações é necessário que você nos permita fazer isso, clicando neste 
-                    ['link'].<br><br>Em caso de recusa, 
-                    você não será penalizado(a) de forma alguma. Se tiver alguma dúvida ou sugestão, você poderá entrar em contato 
-                    com os desenvolvedores responsáveis através do e-mail educolabsre@gmail.com.<br><br>Vambora aprender colaborando com a sua turma 
-                    e ainda participar desta oportunidade científica de aplicação da inteligência artificial na educação?",
+            'text' => block_educolab_default_confirmation_text(),
             'format' => FORMAT_HTML
         ];
         $mform->setDefault('config_confirmation_text', $defaulttext);

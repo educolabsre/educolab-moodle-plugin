@@ -18,6 +18,21 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                 }
             }
 
+            function buildStudentsCsv() {
+                const students = window.educolab.students || [];
+                const csvHeader = ["Nome", "Sobrenome", "Email"];
+                const csvRows = students.map(student => [
+                    student.firstname || '',
+                    student.lastname || '',
+                    student.email || ''
+                ]);
+
+                return [
+                    csvHeader.join(','),
+                    ...csvRows.map(row => row.join(','))
+                ].join('\n');
+            }
+
             async function showToast(message, status) {
                 const toastEl = document.getElementById("successToast");
                 if (!toastEl) return; // Guard against missing element
@@ -167,6 +182,7 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                         nome_professor: forumInfoElement.dataset.nomeprofessor,
                         email_professor: forumInfoElement.dataset.emailprofessor,
                         link_forum: forumInfoElement.dataset.linkforum,
+                        link_curso: forumInfoElement.dataset.linkcurso,
                         data_inicio: startDate,
                         data_final: endDate,
                         estudantes: csv_students,
@@ -217,6 +233,42 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                         });
                 });
 
+                $('#atualizar-estudantes').on('click', function () {
+                    const button = document.getElementById('atualizar-estudantes');
+                    button.setAttribute('disabled', 'true');
+
+                    fetch(apiBaseUrl + '/atualizar-cadastro', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            forumID: forumInfoElement.dataset.forumid,
+                            estudantes: buildStudentsCsv(),
+                            sincronizar_estudantes: true
+                        })
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Request error');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data?.error) {
+                                showToast(data?.error, 'error');
+                            } else {
+                                showToast(data?.success || 'Lista de alunos atualizada com sucesso.', 'success');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error', error);
+                        })
+                        .finally(() => {
+                            button.removeAttribute('disabled');
+                        });
+                });
+
                 $('#analise').on('click', function () {
                     switchPage('analise');
                     document.getElementById('back-arrow').classList.add('active');
@@ -249,7 +301,10 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                         },
                         body: JSON.stringify({
                             forumID: forumInfoElement.dataset.forumid,
-                            messages: csv_messages
+                            messages: csv_messages,
+                            teacher_emails: JSON.parse(forumInfoElement.dataset.teacheremails || '[]'),
+                            confirmacao: forumInfoElement.dataset.confirmacao,
+                            link_curso: forumInfoElement.dataset.linkcurso
                         })
                     })
                         .then(response => {
@@ -297,7 +352,7 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
                 $('#ver-recomendacao').on('click', function () {
                     Ajax.call([{
                         methodname: 'block_educolab_generate_token',
-                        args: {},
+                        args: { courseId: Number(forumInfoElement.dataset.courseid) },
                         done: async function (result) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;
@@ -324,7 +379,7 @@ define(['jquery', 'core/ajax', 'core/str'], function ($, Ajax, Str) {
 
                     Ajax.call([{
                         methodname: 'block_educolab_generate_token',
-                        args: {},
+                        args: { courseId: Number(forumInfoElement.dataset.courseid) },
                         done: async function (result) {
                             if (result.status === 'success' && result.token) {
                                 var token = result.token;

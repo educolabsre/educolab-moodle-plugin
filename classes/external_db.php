@@ -44,7 +44,7 @@ class external_db {
         if ($pdo === null) {
             $host = getenv('EDUCOLAB_DB_HOST') ?: 'localhost';
             $port = getenv('EDUCOLAB_DB_PORT') ?: '3306';
-            $dbname = getenv('EDUCOLAB_DB_NAME') ?: 'educolab';
+            $dbname = getenv('EDUCOLAB_DB_NAME') ?: 'mdl_educolab';
             $user = getenv('EDUCOLAB_DB_USER') ?: '';
             $pass = getenv('EDUCOLAB_DB_PASS') ?: '';
             $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $host, (int) $port, $dbname);
@@ -69,7 +69,7 @@ class external_db {
      */
     public static function get_forum_dates(int $forumid) {
         $pdo = self::get_connection();
-        $stmt = $pdo->prepare('SELECT DataInicio, DataFinal FROM foruns WHERE ForumID = :forumid LIMIT 1');
+        $stmt = $pdo->prepare('SELECT start_date AS DataInicio, end_date AS DataFinal FROM mdl_block_educolab_forums WHERE forum_id = :forumid LIMIT 1');
         $stmt->execute(['forumid' => $forumid]);
         $row = $stmt->fetch();
 
@@ -105,12 +105,12 @@ class external_db {
         
         try {
             // Delete any existing tokens for this user first
-            $deleteStmt = $pdo->prepare('DELETE FROM usuario_tokens WHERE email = :email');
+            $deleteStmt = $pdo->prepare('DELETE FROM mdl_block_educolab_user_tokens WHERE email = :email');
             $deleteStmt->execute(['email' => $email]);
             
             // Insert the new token
             $insertStmt = $pdo->prepare('
-                INSERT INTO usuario_tokens (email, tipo_usuario, token, token_created, token_expires, token_used)
+                INSERT INTO mdl_block_educolab_user_tokens (email, user_type, token, token_created, token_expires, token_used)
                 VALUES (:email, :tipo_usuario, :token, :token_created, :token_expires, 0)
             ');
             $insertStmt->execute([
@@ -140,8 +140,8 @@ class external_db {
     public static function validate_token(string $token) {
         $pdo = self::get_connection();
         $stmt = $pdo->prepare('
-            SELECT id, email, tipo_usuario, token, token_created, token_expires, token_used 
-            FROM usuario_tokens 
+            SELECT id, email, user_type AS tipo_usuario, token, token_created, token_expires, token_used
+            FROM mdl_block_educolab_user_tokens
             WHERE token = :token LIMIT 1
         ');
         $stmt->execute(['token' => $token]);
@@ -173,7 +173,7 @@ class external_db {
      */
     public static function invalidate_token(string $token): void {
         $pdo = self::get_connection();
-        $stmt = $pdo->prepare('UPDATE usuario_tokens SET token_used = 1 WHERE token = :token');
+        $stmt = $pdo->prepare('UPDATE mdl_block_educolab_user_tokens SET token_used = 1 WHERE token = :token');
         $stmt->execute(['token' => $token]);
     }
 
@@ -186,7 +186,7 @@ class external_db {
      */
     public static function get_student_consent(string $email, string $forumid): ?int {
         $pdo = self::get_connection();
-        $stmt = $pdo->prepare('SELECT isConfirmed FROM foruns_estudantes WHERE Email = :email AND ForumID = :forumid LIMIT 1');
+        $stmt = $pdo->prepare('SELECT COALESCE(is_confirmed, 0) AS isConfirmed FROM mdl_block_educolab_forum_students WHERE email = :email AND forum_id = :forumid LIMIT 1');
         $stmt->execute(['email' => $email, 'forumid' => $forumid]);
         $row = $stmt->fetch();
 
@@ -207,7 +207,7 @@ class external_db {
      */
     public static function update_student_consent(string $email, string $forumid, int $isConfirmed): bool {
         $pdo = self::get_connection();
-        $stmt = $pdo->prepare('UPDATE foruns_estudantes SET isConfirmed = :isConfirmed WHERE Email = :email AND ForumID = :forumid');
+        $stmt = $pdo->prepare('UPDATE mdl_block_educolab_forum_students SET is_confirmed = :isConfirmed WHERE email = :email AND forum_id = :forumid');
         $stmt->execute([
             'isConfirmed' => $isConfirmed,
             'email' => $email,
